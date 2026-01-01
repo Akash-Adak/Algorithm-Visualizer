@@ -8,6 +8,13 @@ import { heapSort } from "./sorting/heapSort";
 import { bfs } from "./graph/bfs";
 import { dfs } from "./graph/dfs";
 import { dijkstra } from "./graph/dijkstra";
+import { aStar } from "./graph/aStar";
+import { bellmanFord } from "./graph/bellmanFord";
+import { floydWarshall } from "./graph/floydWarshall";
+import { kruskal } from "./graph/kruskal";
+import { prim } from "./graph/prim";
+import { topologicalSort } from "./graph/topologicalSort";
+import { tsp } from "./graph/tsp";
 export const algorithms = {
   Bubble: bubbleSort,
   Selection: selectionSort,
@@ -17,5 +24,12 @@ export const algorithms = {
   Heap: heapSort,
   BFS: bfs,
   DFS: dfs,
-  Dijkstra :dijkstra
+  Dijkstra :dijkstra,
+  AStar:aStar,
+  BellmanFord:bellmanFord,
+  FloydWarshall:floydWarshall,
+  Kruskal:kruskal,
+  Prim:prim,
+  TopologicalSort:topologicalSort,
+  Tsp:tsp
 };

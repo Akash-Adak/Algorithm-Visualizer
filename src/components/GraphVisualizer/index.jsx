@@ -6,7 +6,7 @@ import { generateRandomGraph } from "../../utils/graphGenerator";
 import { bfs } from "../../algorithms/graph/bfs";
 import { dfs } from "../../algorithms/graph/dfs";
 import { dijkstra } from "../../algorithms/graph/dijkstra";
-
+import { algorithms } from "../../algorithms";
 export default function GraphVisualizer() {
   const [graph, setGraph] = useState(() => generateRandomGraph(8, 0.4));
   const [isPlaying, setIsPlaying] = useState(false);
@@ -63,41 +63,61 @@ export default function GraphVisualizer() {
   }, [resetVisualization]);
 
   // Prepare algorithm
-  const prepareAlgorithm = useCallback(() => {
-    resetVisualization();
-    
-    let algorithmSteps;
-    let stats = { comparisons: 0, operations: 0 };
-    
-    switch (algorithm) {
-      case "BFS":
-        algorithmSteps = bfs(graph, 0);
-        stats.comparisons = algorithmSteps.filter(step => step.type === "compare").length;
-        stats.operations = algorithmSteps.length;
-        break;
-      case "DFS":
-        algorithmSteps = dfs(graph, 0);
-        stats.comparisons = algorithmSteps.filter(step => step.type === "compare").length;
-        stats.operations = algorithmSteps.length;
-        break;
-      case "Dijkstra":
-        algorithmSteps = dijkstra(graph, 0);
-        stats.comparisons = algorithmSteps.filter(step => step.type === "compare").length;
-        stats.operations = algorithmSteps.length;
-        break;
-      default:
-        algorithmSteps = bfs(graph, 0);
-    }
-    
-    setSteps(algorithmSteps);
-    setStatistics(prev => ({
-      ...prev,
-      totalSteps: algorithmSteps.length,
-      comparisons: stats.comparisons,
-      operations: stats.operations
-    }));
-    setStatus(`✅ Prepared ${algorithm}. Click Play ▶️ to start visualization.`);
-  }, [graph, algorithm, resetVisualization]);
+const prepareAlgorithm = useCallback(() => {
+  resetVisualization();
+  
+  let algorithmSteps;
+  let stats = { comparisons: 0, operations: 0 };
+  
+  switch (algorithm) {
+    case "BFS":
+      algorithmSteps =algorithms.BFS(graph, 0);
+      break;
+    case "DFS":
+      algorithmSteps = algorithms.DFS(graph, 0);
+      break;
+    case "Dijkstra":
+      algorithmSteps = algorithms.Dijkstra(graph, 0);
+      break;
+    case "BellmanFord":
+      algorithmSteps = algorithms.BellmanFord(graph, 0);
+      break;
+    case "Topological":
+      algorithmSteps = algorithms.TopologicalSort(graph);
+      break;
+    case "Prim":
+      algorithmSteps = algorithms.Prim(graph, 0);
+      break;
+    case "Kruskal":
+      algorithmSteps = algorithms.Kruskal(graph);
+      break;
+    case "FloydWarshall":
+      algorithmSteps = algorithms.FloydWarshall(graph);
+      break;
+    case "AStar":
+      // For A*, use first and last nodes as start/end
+      const nodes = Object.keys(graph).map(Number);
+      algorithmSteps = algorithms.AStar(graph, 0, nodes[nodes.length - 1]);
+      break;
+    case "TSP":
+      algorithmSteps = algorithms.Tsp(graph, 0);
+      break;
+    default:
+      algorithmSteps = bfs(graph, 0);
+  }
+  
+  stats.comparisons = algorithmSteps.filter(step => step.type === "compare" || step.type === "consider").length;
+  stats.operations = algorithmSteps.length;
+  
+  setSteps(algorithmSteps);
+  setStatistics(prev => ({
+    ...prev,
+    totalSteps: algorithmSteps.length,
+    comparisons: stats.comparisons,
+    operations: stats.operations
+  }));
+  setStatus(`✅ Prepared ${algorithm}. Click Play ▶️ to start visualization.`);
+}, [graph, algorithm, resetVisualization]);
 
   // Animation
   useEffect(() => {
@@ -178,29 +198,71 @@ export default function GraphVisualizer() {
   const progress = steps.length > 0 ? (currentStep / steps.length) * 100 : 0;
 
   // Get algorithm details
-  const getAlgorithmDetails = () => {
-    const details = {
-      BFS: {
-        complexity: "O(V + E)",
-        space: "O(V)",
-        description: "Explores all neighbors at current depth before moving deeper. Ideal for finding shortest paths in unweighted graphs.",
-        dataStructure: "Queue (FIFO)"
-      },
-      DFS: {
-        complexity: "O(V + E)",
-        space: "O(V)",
-        description: "Explores as far as possible along each branch before backtracking. Good for topology sorting, cycle detection.",
-        dataStructure: "Stack (LIFO)"
-      },
-      Dijkstra: {
-        complexity: "O(E log V)",
-        space: "O(V)",
-        description: "Finds shortest paths from source to all vertices in weighted graphs with non-negative edges.",
-        dataStructure: "Priority Queue"
-      }
-    };
-    return details[algorithm] || details.BFS;
+const getAlgorithmDetails = () => {
+  const details = {
+    BFS: {
+      complexity: "O(V + E)",
+      space: "O(V)",
+      description: "Explores all neighbors at current depth before moving deeper. Ideal for finding shortest paths in unweighted graphs.",
+      dataStructure: "Queue (FIFO)"
+    },
+    DFS: {
+      complexity: "O(V + E)",
+      space: "O(V)",
+      description: "Explores as far as possible along each branch before backtracking. Good for topology sorting, cycle detection.",
+      dataStructure: "Stack (LIFO)"
+    },
+    Dijkstra: {
+      complexity: "O(E log V)",
+      space: "O(V)",
+      description: "Finds shortest paths from source to all vertices in weighted graphs with non-negative edges.",
+      dataStructure: "Priority Queue"
+    },
+    BellmanFord: {
+      complexity: "O(VE)",
+      space: "O(V)",
+      description: "Finds shortest paths in weighted graphs with negative edges. Can detect negative cycles.",
+      dataStructure: "Array"
+    },
+    Topological: {
+      complexity: "O(V + E)",
+      space: "O(V)",
+      description: "Linear ordering of vertices in DAG such that for every directed edge u→v, u comes before v.",
+      dataStructure: "Queue + Stack"
+    },
+    Prim: {
+      complexity: "O(E log V)",
+      space: "O(V)",
+      description: "Finds Minimum Spanning Tree (MST) by growing tree from starting node.",
+      dataStructure: "Priority Queue"
+    },
+    Kruskal: {
+      complexity: "O(E log E)",
+      space: "O(V)",
+      description: "Finds MST by sorting edges and adding them without forming cycles.",
+      dataStructure: "Union-Find"
+    },
+    FloydWarshall: {
+      complexity: "O(V³)",
+      space: "O(V²)",
+      description: "Finds shortest paths between all pairs of vertices. Works with negative edges (no negative cycles).",
+      dataStructure: "Adjacency Matrix"
+    },
+    AStar: {
+      complexity: "O(E)",
+      space: "O(V)",
+      description: "Best-first search using heuristics to find shortest path to goal. More efficient than Dijkstra.",
+      dataStructure: "Priority Queue"
+    },
+    TSP: {
+      complexity: "O(n²2ⁿ)",
+      space: "O(n2ⁿ)",
+      description: "Finds shortest Hamiltonian cycle visiting all cities exactly once (NP-hard problem).",
+      dataStructure: "DP Table"
+    }
   };
+  return details[algorithm] || details.BFS;
+};
 
   const algoDetails = getAlgorithmDetails();
 
@@ -233,9 +295,16 @@ export default function GraphVisualizer() {
                 value={algorithm}
                 onChange={(e) => handleAlgorithmChange(e.target.value)}
               >
-                <option value="BFS">Breadth-First Search</option>
+                 <option value="BFS">Breadth-First Search</option>
                 <option value="DFS">Depth-First Search</option>
                 <option value="Dijkstra">Dijkstra's Algorithm</option>
+                <option value="BellmanFord">Bellman-Ford Algorithm</option>
+                <option value="Topological">Topological Sort</option>
+                <option value="Prim">Prim's MST</option>
+                <option value="Kruskal">Kruskal's MST</option>
+                <option value="FloydWarshall">Floyd-Warshall</option>
+                <option value="AStar">A* Search</option>
+                <option value="TSP">Traveling Salesman</option>
               </select>
               
               <button

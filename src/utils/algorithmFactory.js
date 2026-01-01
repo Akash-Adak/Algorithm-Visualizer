@@ -17,7 +17,12 @@ export const ALGORITHMS = {
   Merge: { type: ALGORITHM_TYPES.SORTING, fn: sortingAlgorithms.Merge },
   Quick: { type: ALGORITHM_TYPES.SORTING, fn: sortingAlgorithms.Quick },
   Heap: { type: ALGORITHM_TYPES.SORTING, fn: sortingAlgorithms.Heap },
-  
+  AStar: { type: ALGORITHM_TYPES.GRAPH, fn: sortingAlgorithms.AStar },
+ BellmanFord: { type: ALGORITHM_TYPES.GRAPH, fn: sortingAlgorithms.BellmanFord },
+  FloydWarshall: { type: ALGORITHM_TYPES.GRAPH, fn: sortingAlgorithms.FloydWarshall },
+   Kruskal: { type: ALGORITHM_TYPES.GRAPH, fn: sortingAlgorithms.Kruskal },
+    Prim: { type: ALGORITHM_TYPES.GRAPH, fn: sortingAlgorithms.Prim },
+     TopologicalSort: { type: ALGORITHM_TYPES.GRAPH, fn: sortingAlgorithms.TopologicalSort },
   // Graph Algorithms
   BFS: { 
     type: ALGORITHM_TYPES.GRAPH, 
