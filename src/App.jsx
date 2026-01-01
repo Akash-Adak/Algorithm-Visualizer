@@ -1,4 +1,4 @@
-import SortingVisualizer from "./pages/SortingVisualizer";
+import SortingVisualizer from "./components/SortingVisualizer/index";
 
 function App() {
   return <SortingVisualizer />;
