@@ -1,7 +1,7 @@
-import SortingVisualizer from "./components/SortingVisualizer/index";
+import AlgorithmVisualizer from "./components/AlgorithmVisualizer/index";
 
 function App() {
-  return <SortingVisualizer />;
+  return <AlgorithmVisualizer />;
 }
 
 export default App;

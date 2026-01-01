@@ -5,12 +5,17 @@ import { insertionSort } from "./sorting/insertionSort";
 import { mergeSort } from "./sorting/mergeSort";
 import { quickSort } from "./sorting/quickSort";
 import { heapSort } from "./sorting/heapSort";
-
+import { bfs } from "./graph/bfs";
+import { dfs } from "./graph/dfs";
+import { dijkstra } from "./graph/dijkstra";
 export const algorithms = {
   Bubble: bubbleSort,
   Selection: selectionSort,
   Insertion: insertionSort,
   Merge: mergeSort,
   Quick: quickSort,
-  Heap: heapSort
+  Heap: heapSort,
+  BFS: bfs,
+  DFS: dfs,
+  Dijkstra :dijkstra
 };
