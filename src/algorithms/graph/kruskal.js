@@ -1,107 +1,109 @@
-// algorithms/graph/kruskal.js
 export function kruskal(graph) {
   const steps = [];
+  const mstEdges = [];
+  const visited = new Set();
+
+  /* ================= 1️⃣ COLLECT UNIQUE EDGES ================= */
+
   const edges = [];
-  const mst = [];
-  
-  // Collect all edges
+  const seen = new Set();
+
   Object.entries(graph).forEach(([from, neighbors]) => {
-    neighbors.forEach(neighbor => {
-      edges.push({
-        from: Number(from),
-        to: neighbor.node,
-        weight: neighbor.weight
-      });
+    neighbors.forEach(({ node: to, weight }) => {
+      const u = Number(from);
+      const v = Number(to);
+      const key = u < v ? `${u}-${v}` : `${v}-${u}`;
+
+      if (!seen.has(key)) {
+        seen.add(key);
+        edges.push({ from: u, to: v, weight });
+      }
     });
   });
-  
-  // Sort edges by weight
+
   edges.sort((a, b) => a.weight - b.weight);
-  
+
   steps.push({
     type: "init",
-    edges: edges.length,
-    description: `Collected ${edges.length} edges, sorted by weight`
+    edges: [...edges],
+    mstEdges: [],
+    description: `Collected ${edges.length} unique edges and sorted by weight`
   });
-  
-  // Union-Find data structure
+
+  /* ================= 2️⃣ UNION FIND ================= */
+
   const parent = {};
   const rank = {};
-  
-  Object.keys(graph).forEach(node => {
-    parent[node] = Number(node);
-    rank[node] = 0;
+
+  Object.keys(graph).forEach(n => {
+    parent[n] = Number(n);
+    rank[n] = 0;
   });
-  
-  function find(node) {
-    if (parent[node] !== node) {
-      parent[node] = find(parent[node]);
+
+  const find = (x) => {
+    if (parent[x] !== x) parent[x] = find(parent[x]);
+    return parent[x];
+  };
+
+  const union = (a, b) => {
+    const ra = find(a);
+    const rb = find(b);
+    if (ra === rb) return false;
+
+    if (rank[ra] < rank[rb]) parent[ra] = rb;
+    else if (rank[ra] > rank[rb]) parent[rb] = ra;
+    else {
+      parent[rb] = ra;
+      rank[ra]++;
     }
-    return parent[node];
-  }
-  
-  function union(a, b) {
-    const rootA = find(a);
-    const rootB = find(b);
-    
-    if (rootA === rootB) return false;
-    
-    if (rank[rootA] < rank[rootB]) {
-      parent[rootA] = rootB;
-    } else if (rank[rootA] > rank[rootB]) {
-      parent[rootB] = rootA;
-    } else {
-      parent[rootB] = rootA;
-      rank[rootA]++;
-    }
-    
     return true;
-  }
-  
-  // Process edges
+  };
+
+  /* ================= 3️⃣ KRUSKAL PROCESS ================= */
+
   for (const edge of edges) {
-    const { from, to, weight } = edge;
-    
     steps.push({
       type: "consider",
-      from,
-      to,
-      weight,
-      parent: { ...parent },
-      description: `Considering edge ${from}→${to} (weight: ${weight})`
+      currentEdge: edge,
+      mstEdges: [...mstEdges],
+      description: `Considering edge ${edge.from} → ${edge.to} (w=${edge.weight})`
     });
-    
-    if (find(from) !== find(to)) {
-      union(from, to);
-      mst.push(edge);
-      
+
+    if (union(edge.from, edge.to)) {
+      mstEdges.push(edge);
+      visited.add(edge.from);
+      visited.add(edge.to);
+
       steps.push({
         type: "addEdge",
-        from,
-        to,
-        weight,
-        mst: [...mst],
-        description: `Added edge ${from}→${to} to MST (no cycle formed)`
+        currentEdge: edge,
+        mstEdges: [...mstEdges],
+        visited: new Set(visited),
+        description: `Added edge ${edge.from} → ${edge.to} to MST`
       });
     } else {
       steps.push({
         type: "skip",
-        from,
-        to,
-        description: `Skipped edge ${from}→${to} (would create cycle)`
+        currentEdge: edge,
+        mstEdges: [...mstEdges],
+        description: `Skipped edge ${edge.from} → ${edge.to} (cycle)`
       });
     }
-    
-    if (mst.length === Object.keys(graph).length - 1) break;
+
+    if (mstEdges.length === Object.keys(graph).length - 1) break;
   }
-  
-  const totalWeight = mst.reduce((sum, edge) => sum + edge.weight, 0);
+
+  /* ================= 4️⃣ FINAL RESULT ================= */
+
+  const totalWeight = mstEdges.reduce((s, e) => s + e.weight, 0);
+
   steps.push({
     type: "complete",
-    mst: [...mst],
+    mstEdges: [...mstEdges],
     totalWeight,
-    description: `✅ Kruskal's algorithm completed! MST weight: ${totalWeight}, ${mst.length} edges`
+    visited: new Set(visited),
+    description: `✅ MST completed | Weight = ${totalWeight}`
   });
-  
+
   return steps;
 }

@@ -42,18 +42,6 @@ const ALGORITHMS = {
     desc: "Shortest path with negative weights",
     resultType: "distance"
   },
-  AStar: {
-    time: "O(E)",
-    space: "O(V)",
-    desc: "Heuristic-based shortest path",
-    resultType: "path"
-  },
-  FloydWarshall: {
-    time: "O(V³)",
-    space: "O(V²)",
-    desc: "All-pairs shortest paths",
-    resultType: "matrix"
-  },
   Prim: {
     time: "O(E log V)",
     space: "O(V)",
@@ -125,17 +113,25 @@ export default function GraphVisualizer() {
         setIsPlaying(false);
         setStatus("Completed");
 
-        setResult({
-          visited: Array.from(visited),
-          distances,
-          path: Array.from(path)
-        });
+     setResult({
+        visited: Array.from(visited),
+        distances,
+        path: Array.from(path),
+        mstEdges: steps[steps.length - 1]?.mstEdges || [],
+        totalWeight: steps[steps.length - 1]?.totalWeight
+      });
+
       }
       return;
     }
 
     const t = setTimeout(() => {
       const s = steps[stepIndex];
+      if (s.mstEdges) {
+  setPath(
+    new Set(s.mstEdges.flatMap(e => [e.from, e.to]))
+  );
+}
       if (!s) return;
 
       if (s.visited) setVisited(new Set(s.visited));
@@ -303,6 +299,34 @@ export default function GraphVisualizer() {
                     ))}
                   </ul>
                 )}
+                {meta.resultType === "edges" && result.mstEdges?.length > 0 && (
+                  <>
+                    <div className="mb-2 text-sm text-gray-400">
+                      Minimum Spanning Tree
+                    </div>
+
+                    <ul className="space-y-1 text-sm">
+                      {result.mstEdges.map((e, i) => (
+                        <li
+                          key={i}
+                          className="flex justify-between bg-gray-700/60 px-2 py-1 rounded"
+                        >
+                          <span>
+                            {e.from} → {e.to}
+                          </span>
+                          <span className="text-green-400">
+                            {e.weight}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <div className="mt-2 text-right text-green-400 font-semibold">
+                      Total Weight: {result.totalWeight}
+                    </div>
+                  </>
+                )}
+
               </div>
             )}
 
