@@ -13,8 +13,7 @@ import { bellmanFord } from "./graph/bellmanFord";
 import { floydWarshall } from "./graph/floydWarshall";
 import { kruskal } from "./graph/kruskal";
 import { prim } from "./graph/prim";
-import { topologicalSort } from "./graph/topologicalSort";
-import { tsp } from "./graph/tsp";
+
 export const algorithms = {
   Bubble: bubbleSort,
   Selection: selectionSort,
@@ -29,7 +28,5 @@ export const algorithms = {
   BellmanFord:bellmanFord,
   FloydWarshall:floydWarshall,
   Kruskal:kruskal,
-  Prim:prim,
-  TopologicalSort:topologicalSort,
-  Tsp:tsp
+  Prim:prim
 };
