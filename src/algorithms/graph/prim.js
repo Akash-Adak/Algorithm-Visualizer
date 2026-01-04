@@ -1,87 +1,109 @@
-// algorithms/graph/prim.js
 export function prim(graph, startNode = 0) {
   const steps = [];
   const visited = new Set();
-  const mst = [];
-  const edges = [];
+  const mstEdges = [];
+
+  const nodes = Object.keys(graph).map(Number);
   const key = {};
   const parent = {};
-  const nodes = Object.keys(graph).map(Number);
-  
-  // Initialize keys
+
+  /* ================= 1️⃣ INITIALIZATION ================= */
+
   nodes.forEach(node => {
     key[node] = Infinity;
     parent[node] = null;
   });
+
   key[startNode] = 0;
-  
+
+  let pq = [...nodes];
+
   steps.push({
     type: "init",
     startNode,
     key: { ...key },
+    visited: new Set(),
+    mstEdges: [],
+    frontier: new Set(pq),
     description: `Starting Prim's algorithm from node ${startNode}`
   });
-  
-  // Priority queue (simulated with array)
-  const pq = [...nodes];
-  
+
+  /* ================= 2️⃣ MAIN LOOP ================= */
+
   while (pq.length > 0) {
-    // Find node with minimum key
+    // Extract min key node
     pq.sort((a, b) => key[a] - key[b]);
     const current = pq.shift();
-    
+
     if (key[current] === Infinity) break;
-    
+
     visited.add(current);
-    
+
     steps.push({
       type: "select",
       current,
       key: key[current],
       visited: new Set(visited),
-      description: `Selected node ${current} with key ${key[current]}`
+      mstEdges: [...mstEdges],
+      frontier: new Set(pq),
+      description: `Selected node ${current} with minimum key ${key[current]}`
     });
-    
-    // Add edge to MST if not start node
+
+    // Add edge to MST
     if (parent[current] !== null) {
-      mst.push({ from: parent[current], to: current, weight: key[current] });
-      steps.push({
-        type: "addEdge",
+      const edge = {
         from: parent[current],
         to: current,
-        weight: key[current],
-        mst: [...mst],
-        description: `Added edge ${parent[current]}→${current} (weight: ${key[current]}) to MST`
+        weight: key[current]
+      };
+
+      mstEdges.push(edge);
+
+      steps.push({
+        type: "addEdge",
+        current,
+        mstEdges: [...mstEdges],
+        visited: new Set(visited),
+        frontier: new Set(pq),
+        description: `Added edge ${edge.from} → ${edge.to} (w=${edge.weight}) to MST`
       });
     }
-    
-    // Update keys of adjacent nodes
-    const neighbors = graph[current] || [];
-    neighbors.forEach(neighbor => {
-      if (!visited.has(neighbor.node) && neighbor.weight < key[neighbor.node]) {
-        key[neighbor.node] = neighbor.weight;
-        parent[neighbor.node] = current;
-        
+
+    // Relax neighbors
+    for (const neighbor of graph[current] || []) {
+      const v = neighbor.node;
+      const w = neighbor.weight;
+
+      if (!visited.has(v) && w < key[v]) {
+        key[v] = w;
+        parent[v] = current;
+
         steps.push({
           type: "updateKey",
-          current,
-          neighbor: neighbor.node,
-          newKey: neighbor.weight,
+          from: current,
+          to: v,
+          newKey: w,
           key: { ...key },
-          description: `Updated key of node ${neighbor.node} to ${neighbor.weight} (via ${current})`
+          visited: new Set(visited),
+          mstEdges: [...mstEdges],
+          frontier: new Set(pq),
+          description: `Updated key of node ${v} to ${w} via ${current}`
         });
       }
-    });
+    }
   }
-  
-  const totalWeight = mst.reduce((sum, edge) => sum + edge.weight, 0);
+
+  /* ================= 3️⃣ FINAL RESULT ================= */
+
+  const totalWeight = mstEdges.reduce((s, e) => s + e.weight, 0);
+
   steps.push({
     type: "complete",
-    mst: [...mst],
+    mstEdges: [...mstEdges],
     totalWeight,
     visited: new Set(visited),
-    description: `✅ Prim's algorithm completed! MST weight: ${totalWeight}, Edges: ${mst.map(e => `${e.from}-${e.to}`).join(', ')}`
+    description: `✅ Prim's algorithm completed. MST weight = ${totalWeight}`
   });
-  
+
   return steps;
 }

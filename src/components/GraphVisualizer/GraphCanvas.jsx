@@ -20,7 +20,7 @@ export default function GraphCanvas({
   const [isReady, setIsReady] = useState(false);
 
   /* -------------------------------------------
-     1️⃣ Resize Observer (more stable than window resize)
+     1️⃣ Resize Observer
   -------------------------------------------- */
   useEffect(() => {
     if (!containerRef.current) return;
@@ -62,7 +62,7 @@ export default function GraphCanvas({
   }, [graph, dimensions]);
 
   /* -------------------------------------------
-     3️⃣ Memoized edge list (performance)
+     3️⃣ Memoized edge list
   -------------------------------------------- */
   const edges = useMemo(() => {
     const list = [];
@@ -79,7 +79,7 @@ export default function GraphCanvas({
   }, [graph]);
 
   /* -------------------------------------------
-     4️⃣ Draw edges on canvas
+     4️⃣ Draw edges
   -------------------------------------------- */
   useEffect(() => {
     if (!isReady || !canvasRef.current) return;
@@ -117,7 +117,6 @@ export default function GraphCanvas({
       ctx.lineWidth = width;
       ctx.stroke();
 
-      // Weight label
       const showWeight =
         ["Dijkstra", "BellmanFord", "Prim", "Kruskal", "TSP", "FloydWarshall"].includes(
           algorithm
@@ -149,19 +148,19 @@ export default function GraphCanvas({
   ]);
 
   /* -------------------------------------------
-     5️⃣ Algorithm info helpers
+     5️⃣ Algorithm info
   -------------------------------------------- */
   const algorithmInfo = {
-    BFS: "Level-order traversal (unweighted)",
+    BFS: "Level-order traversal",
     DFS: "Depth-first exploration",
-    Dijkstra: "Shortest paths (non-negative weights)",
-    BellmanFord: "Shortest paths (supports negative weights)",
-    Prim: "Minimum Spanning Tree (greedy)",
-    Kruskal: "Minimum Spanning Tree (union-find)",
+    Dijkstra: "Shortest paths (non-negative)",
+    BellmanFord: "Shortest paths (negative allowed)",
+    Prim: "Minimum Spanning Tree",
+    Kruskal: "Minimum Spanning Tree",
     FloydWarshall: "All-pairs shortest paths",
     AStar: "Heuristic guided search",
-    Topological: "Linear ordering of DAG",
-    TSP: "Traveling Salesman (NP-hard)"
+    Topological: "DAG ordering",
+    TSP: "Traveling Salesman"
   };
 
   const algorithmColor = {
@@ -185,6 +184,16 @@ export default function GraphCanvas({
       ref={containerRef}
       className="relative w-full h-full bg-gradient-to-br from-gray-900 to-slate-950 rounded-xl overflow-hidden border border-gray-800"
     >
+      {/* ✅ MOBILE HEADER (no overlap) */}
+      <div className="md:hidden px-3 py-2 bg-gray-900/90 border-b border-gray-800">
+        <div className={`font-bold ${algorithmColor[algorithm]}`}>
+          {algorithm}
+        </div>
+        <div className="text-xs text-gray-400">
+          {algorithmInfo[algorithm]}
+        </div>
+      </div>
+
       <canvas ref={canvasRef} className="absolute inset-0" />
 
       {isReady &&
@@ -218,9 +227,9 @@ export default function GraphCanvas({
         </div>
       )}
 
-      {/* Algorithm badge */}
+      {/* ✅ DESKTOP FLOATING BADGE */}
       <div
-        className={`absolute top-4 left-4 px-4 py-2 rounded-lg bg-gray-900/80 border border-gray-700 backdrop-blur ${algorithmColor[algorithm]}`}
+        className={`hidden md:block absolute top-4 left-4 px-4 py-2 rounded-lg bg-gray-900/80 border border-gray-700 backdrop-blur ${algorithmColor[algorithm]}`}
       >
         <div className="font-bold">{algorithm}</div>
         <div className="text-xs opacity-90">{algorithmInfo[algorithm]}</div>
