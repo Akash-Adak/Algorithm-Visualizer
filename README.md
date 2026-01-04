@@ -11,7 +11,7 @@ A comprehensive, interactive web application for visualizing sorting and graph a
 
 🔗 **[Try it live here!]({https://algorithm-visualizer-three-eta.vercel.app/})** 
 
-![alt text]({8481E46C-80D5-40BD-9423-5E3AF7810D78}.png)
+![alt text]({9B63E766-91C2-4F16-A103-8DD3FB884F1E}.png)
 ![alt text]({9B63E766-91C2-4F16-A103-8DD3FB884F1E}.png)
 ## 📱 Features
 
