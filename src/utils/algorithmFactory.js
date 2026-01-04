@@ -22,7 +22,7 @@ export const ALGORITHMS = {
   FloydWarshall: { type: ALGORITHM_TYPES.GRAPH, fn: sortingAlgorithms.FloydWarshall },
    Kruskal: { type: ALGORITHM_TYPES.GRAPH, fn: sortingAlgorithms.Kruskal },
     Prim: { type: ALGORITHM_TYPES.GRAPH, fn: sortingAlgorithms.Prim },
-     TopologicalSort: { type: ALGORITHM_TYPES.GRAPH, fn: sortingAlgorithms.TopologicalSort },
+
   // Graph Algorithms
   BFS: { 
     type: ALGORITHM_TYPES.GRAPH, 
